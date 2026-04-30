@@ -1,59 +1,66 @@
-# Unit Test 실행 가이드 - Unit 4 (UI)
+# Unit Test Execution Instructions
 
-## 테스트 프레임워크
-- **러너**: Vitest
-- **DOM 환경**: jsdom
-- **컴포넌트 테스트**: React Testing Library
-- **커버리지**: @vitest/coverage-v8
+## Prerequisites
+- 가상환경 활성화 및 의존성 설치 완료
+- 테스트 DB 생성 완료 (`table_order_test`)
 
-## 테스트 실행
+## Run Unit Tests
 
-### 고객 앱 전체 테스트
+### 1. 전체 단위 테스트 실행
 ```bash
-cd frontend-customer
-npm run test
+cd backend
+pytest tests/unit/ -v
 ```
 
-### 관리자 앱 전체 테스트
+### 2. 커버리지 포함 실행
 ```bash
-cd frontend-admin
-npm run test
+pytest tests/unit/ -v --cov=app --cov-report=term-missing
 ```
 
-### 커버리지 포함 실행
+### 3. 특정 모듈 테스트
 ```bash
-cd frontend-customer
-npm run test:coverage
+# 유틸리티 테스트
+pytest tests/unit/test_security.py -v
+pytest tests/unit/test_exceptions.py -v
+pytest tests/unit/test_order_number.py -v
+
+# Service 테스트
+pytest tests/unit/services/ -v
+
+# Repository 테스트 (DB 필요)
+pytest tests/unit/repositories/ -v
 ```
 
-### 특정 파일만 실행
-```bash
-cd frontend-customer
-npx vitest run tests/unit/store/cartStore.test.ts
-```
+## Expected Results
 
-## 테스트 목록
-
-### 고객 앱 단위 테스트
-
-| 파일 | 테스트 수 | 대상 |
+### 유틸리티 테스트 (~21 tests)
+| 테스트 파일 | 테스트 수 | 설명 |
 |---|---|---|
-| tests/unit/store/cartStore.test.ts | 9 | 장바구니 Store (추가, 삭제, 수량, 최대 50개, 총액) |
-| tests/unit/store/authStore.test.ts | 3 | 인증 Store (로그인, 로그아웃, 세션 ID) |
-| tests/unit/utils/format.test.ts | 5 | 금액/날짜 포맷 유틸 |
+| test_security.py | 8 | bcrypt 해싱, JWT 생성/검증 |
+| test_exceptions.py | 10 | 커스텀 예외 클래스 속성 |
+| test_order_number.py | 3 | 주문 번호 형식/순번 |
 
-### 관리자 앱 단위 테스트
-
-| 파일 | 테스트 수 | 대상 |
+### Service 테스트 (~21 tests)
+| 테스트 파일 | 테스트 수 | 설명 |
 |---|---|---|
-| tests/unit/store/authStore.test.ts | 3 | 관리자 인증 Store (로그인, 역할, 로그아웃) |
+| test_auth_service.py | 7 | 로그인 성공/실패/잠금, 계정 등록 |
+| test_store_service.py | 4 | 매장 생성/조회/중복 |
+| test_table_service.py | 4 | 테이블 생성/조회/중복/매장 격리 |
+| test_session_service.py | 6 | 세션 생성/만료/종료 |
 
-## 예상 결과
-- **총 테스트**: 20개
-- **예상 통과**: 20/20
-- **커버리지 목표**: 80% 이상 (Store, 유틸 레이어)
+### Repository 테스트 (~11 tests)
+| 테스트 파일 | 테스트 수 | 설명 |
+|---|---|---|
+| test_store_repository.py | 4 | CRUD, 코드 조회, 활성 필터 |
+| test_user_repository.py | 2 | 생성, 매장+사용자명 조회 |
+| test_table_repository.py | 2 | 생성, 매장별 조회 |
+| test_session_repository.py | 3 | 활성/만료 세션 조회 |
 
-## 실패 시 대응
-1. 실패한 테스트 출력 확인
-2. 관련 소스 코드 수정
-3. `npm run test` 재실행
+## Test Coverage Target
+- **목표**: 80% 이상
+- **핵심 모듈**: Service, Repository 90% 이상
+
+## Fix Failing Tests
+1. 테스트 출력에서 실패 원인 확인
+2. `pytest tests/unit/path/to/test.py::TestClass::test_method -v` 로 개별 실행
+3. 코드 수정 후 재실행

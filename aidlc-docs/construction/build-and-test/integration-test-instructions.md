@@ -1,58 +1,81 @@
-# Integration Test 가이드 - Unit 4 (UI)
+# Integration Test Instructions
 
-## 목적
-페이지 레벨에서 컴포넌트 간 상호작용을 검증합니다.
+## Purpose
+Router 레이어를 통한 전체 API 흐름을 테스트합니다. 실제 DB와 연동하여 엔드투엔드 동작을 검증합니다.
 
-## 테스트 시나리오
+## Prerequisites
+- 테스트 DB 생성 완료 (`table_order_test`)
+- 의존성 설치 완료
 
-### 시나리오 1: 장바구니 플로우 (CartPage)
-- **설명**: 장바구니 아이템 추가 → 수량 변경 → 총액 계산 → 주문하기 이동
-- **사전 조건**: cartStore에 아이템이 있는 상태
-- **검증 항목**:
-  - 아이템 목록 렌더링
-  - 수량 증가/감소 버튼 동작
-  - 총액 실시간 업데이트
-  - "주문하기" 버튼 활성화/비활성화
-  - "비우기" 버튼 동작
+## Run Integration Tests
 
-### 시나리오 2: 초기 설정 플로우 (SetupPage)
-- **설명**: 폼 입력 → 유효성 검증 → API 호출 → 리다이렉트
-- **사전 조건**: 인증되지 않은 상태
-- **검증 항목**:
-  - 필수 필드 유효성 검증 에러 표시
-  - 로그인 성공 시 메뉴 페이지 리다이렉트
-  - 로그인 실패 시 에러 메시지 표시
-
-### 시나리오 3: 주문 확인 플로우 (OrderConfirmPage)
-- **설명**: 주문 내역 확인 → 주문 확정 → 성공 오버레이 → 5초 리다이렉트
-- **사전 조건**: cartStore에 아이템이 있는 상태
-- **검증 항목**:
-  - 주문 아이템 목록 표시
-  - "주문 확정" 버튼 클릭 시 API 호출
-  - 성공 시 장바구니 비움
-  - 5초 카운트다운 표시
-
-### 시나리오 4: 관리자 로그인 플로우 (LoginPage)
-- **설명**: 폼 입력 → 로그인 → 대시보드 이동
-- **검증 항목**:
-  - 필수 필드 유효성 검증
-  - 로그인 성공 시 대시보드 리다이렉트
-  - 인증 실패 시 에러 메시지
-  - 429 응답 시 잠금 메시지
-
-## 실행 방법
-
-### MSW를 사용한 통합 테스트
+### 1. 전체 통합 테스트 실행
 ```bash
-cd frontend-customer
-npx vitest run tests/integration/
+cd backend
+pytest tests/integration/ -v
 ```
 
+### 2. 커버리지 포함 실행
 ```bash
-cd frontend-admin
-npx vitest run tests/integration/
+pytest tests/integration/ -v --cov=app --cov-report=term-missing
 ```
 
-## 참고
-- 통합 테스트는 MSW를 사용하여 API를 Mock합니다
-- 실제 백엔드 연동 테스트는 E2E 테스트에서 수행합니다
+### 3. 특정 라우터 테스트
+```bash
+# Health Check
+pytest tests/integration/test_health_router.py -v
+
+# 본사 매장 관리 API
+pytest tests/integration/test_hq_router.py -v
+
+# 관리자 인증 API
+pytest tests/integration/test_admin_auth_router.py -v
+
+# 관리자 테이블 관리 API
+pytest tests/integration/test_admin_tables_router.py -v
+
+# 고객 태블릿 인증 API
+pytest tests/integration/test_customer_auth_router.py -v
+
+# 고객 세션 API
+pytest tests/integration/test_customer_session_router.py -v
+```
+
+## Test Scenarios
+
+### Scenario 1: 매장 등록 → 관리자 로그인 (US-H01 → US-A01)
+1. HQ 관리자가 매장 등록 (`POST /api/hq/stores`)
+2. 매장 관리자 계정 등록 (`POST /api/admin/auth/register`)
+3. 관리자 로그인 (`POST /api/admin/auth/login`)
+4. JWT 토큰으로 관리자 API 접근
+
+### Scenario 2: 테이블 등록 → 태블릿 로그인 → 세션 (US-A04 → US-C01 → US-C02)
+1. 관리자가 테이블 등록 (`POST /api/admin/tables`)
+2. 태블릿 로그인 (`POST /api/customer/auth/login`)
+3. 현재 세션 조회 (`GET /api/customer/session/current`)
+
+### Scenario 3: 이용 완료 (US-A06)
+1. 활성 세션이 있는 테이블
+2. 관리자가 이용 완료 (`POST /api/admin/tables/{id}/complete`)
+3. 세션 상태 completed 확인
+
+### Scenario 4: 인증 실패 시나리오
+1. 잘못된 비밀번호로 로그인 시도 → 401
+2. 5회 실패 후 계정 잠금 → 401 (AUTH_LOCKED)
+3. 토큰 없이 API 접근 → 401
+4. 다른 역할로 API 접근 → 403
+
+## Expected Results
+
+| 테스트 파일 | 테스트 수 | 설명 |
+|---|---|---|
+| test_health_router.py | 1 | Health Check 200 |
+| test_hq_router.py | 4 | 매장 CRUD + 인증 |
+| test_admin_auth_router.py | 3 | 로그인/실패/등록 |
+| test_admin_tables_router.py | 3 | 테이블 등록/목록/이용완료 |
+| test_customer_auth_router.py | 2 | 태블릿 로그인/실패 |
+| test_customer_session_router.py | 2 | 세션 조회/없음 |
+| **합계** | **15** | |
+
+## Cleanup
+테스트는 각 함수마다 DB를 초기화하므로 별도 정리 불필요 (conftest.py의 db_session fixture).

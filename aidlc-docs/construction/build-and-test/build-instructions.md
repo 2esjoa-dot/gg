@@ -1,72 +1,76 @@
-# Build Instructions - Unit 4 (UI)
+# Build Instructions - 테이블오더 서비스 Backend API
 
-## 사전 요구사항
-- **Node.js**: v18.x 이상
-- **npm**: v9.x 이상
-- **디스크 공간**: 500MB 이상 (node_modules)
+## Prerequisites
+- **Python**: 3.11+
+- **PostgreSQL**: 15+
+- **pip**: 최신 버전
+- **libmagic**: python-magic 의존성 (macOS: `brew install libmagic`, Linux: `apt install libmagic1`)
 
-## 빌드 순서
+## Build Steps
 
-### 1. 고객 앱 의존성 설치
+### 1. 가상환경 생성 및 활성화
 ```bash
-cd frontend-customer
-npm install
+cd backend
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+# Windows: venv\Scripts\activate
 ```
 
-### 2. 관리자 앱 의존성 설치
+### 2. 의존성 설치
 ```bash
-cd frontend-admin
-npm install
+pip install -r requirements.txt
 ```
 
-### 3. 고객 앱 빌드
+### 3. 환경 설정
 ```bash
-cd frontend-customer
-npm run build
+cp .env.example .env
+# .env 파일을 편집하여 실제 값 설정
+# 특히 DATABASE_URL, SECRET_KEY 변경 필수
 ```
-- **예상 출력**: `dist/` 디렉토리에 정적 파일 생성
-- **예상 번들 사이즈**: 초기 로드 200KB 이하 (gzip)
 
-### 4. 관리자 앱 빌드
+### 4. 데이터베이스 생성
 ```bash
-cd frontend-admin
-npm run build
+# PostgreSQL에서 개발/테스트 DB 생성
+createdb table_order_dev
+createdb table_order_test
 ```
-- **예상 출력**: `dist/` 디렉토리에 정적 파일 생성
 
-## 개발 서버 실행
-
-### 고객 앱 (Mock 모드)
+### 5. 마이그레이션 실행
 ```bash
-cd frontend-customer
-VITE_ENABLE_MOCKS=true npm run dev
+alembic upgrade head
 ```
-- URL: http://localhost:5173
 
-### 관리자 앱 (Mock 모드)
+### 6. 디렉토리 생성
 ```bash
-cd frontend-admin
-VITE_ENABLE_MOCKS=true npm run dev
+mkdir -p uploads logs
 ```
-- URL: http://localhost:5174
 
-### 백엔드 연동 모드
+### 7. 서버 실행 (개발)
 ```bash
-cd frontend-customer
-npm run dev
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-- 백엔드가 http://localhost:8000 에서 실행 중이어야 함
-- Vite proxy가 `/api` 요청을 백엔드로 전달
 
-## 트러블슈팅
+### 8. 빌드 검증
+- Swagger UI 접속: http://localhost:8000/docs
+- ReDoc 접속: http://localhost:8000/redoc
+- Health Check: http://localhost:8000/health
 
-### 의존성 설치 실패
-- `rm -rf node_modules package-lock.json && npm install`
+## Docker 빌드 (선택)
+```bash
+docker build -t table-order-api .
+docker run -p 8000:8000 --env-file .env table-order-api
+```
 
-### TypeScript 컴파일 에러
-- `npx tsc --noEmit` 으로 타입 에러 확인
-- `tsconfig.json`의 `strict: true` 설정 확인
+## Troubleshooting
 
-### Tailwind 스타일 미적용
-- `tailwind.config.ts`의 `content` 경로 확인
-- `src/index.css`에 `@tailwind` 디렉티브 확인
+### libmagic 관련 에러
+- **macOS**: `brew install libmagic`
+- **Ubuntu/Debian**: `sudo apt-get install libmagic1`
+
+### asyncpg 연결 실패
+- PostgreSQL 서비스 실행 확인: `pg_isready`
+- DATABASE_URL 형식 확인: `postgresql+asyncpg://user:pass@host:5432/dbname`
+
+### Alembic 마이그레이션 실패
+- DB 연결 확인 후 재시도
+- `alembic downgrade base` 후 `alembic upgrade head`
