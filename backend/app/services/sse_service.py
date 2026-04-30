@@ -17,8 +17,12 @@ class SSEService:
         self._subscribers[store_id].append(queue)
         try:
             while True:
-                data = await queue.get()
-                yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+                try:
+                    data = await asyncio.wait_for(queue.get(), timeout=15.0)
+                    yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+                except asyncio.TimeoutError:
+                    # keep-alive every 15 seconds
+                    yield ": keep-alive\n\n"
         finally:
             self._subscribers[store_id].remove(queue)
 

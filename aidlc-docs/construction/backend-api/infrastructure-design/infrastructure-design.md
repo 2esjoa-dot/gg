@@ -7,11 +7,11 @@
                         |
                    [Route 53]
                         |
-                  [ALB / Nginx]
-                   /    |    \
-                  /     |     \
-    [EC2: Backend]  [S3: Customer]  [S3: Admin]
-         |               Static         Static
+                  [Nginx on EC2]
+                   /         \
+                  /           \
+    [uvicorn :8000]    [Static Files]
+         |              (customer + admin 빌드)
          |
     [RDS PostgreSQL]
 ```
@@ -72,8 +72,9 @@ VPC (10.0.0.0/16)
 | SG | Inbound | Source |
 |---|---|---|
 | sg-web | 80, 443 | 0.0.0.0/0 |
-| sg-app | 8000 | sg-web |
-| sg-db | 5432 | sg-app |
+| sg-db | 5432 | sg-web (EC2) |
+
+*Note: Nginx → uvicorn은 같은 EC2 내 localhost 통신이므로 별도 SG 불필요*
 
 ---
 
