@@ -239,3 +239,141 @@ Plan 승인 간주하고 Part 2 Generation 진행
 **Context**: CONSTRUCTION - Unit 1 Functional Design 완료, 사용자 승인 대기
 
 ---
+
+## CONSTRUCTION - Unit 4 (UI) - Functional Design Started
+**Timestamp**: 2026-04-30T01:00:00Z
+**User Input**: "진행하자. PO가 확정했어."
+**AI Response**: Unit 4 (UI) Functional Design 시작. 기존 아티팩트 로드 완료:
+- unit-of-work.md (4명 병렬 개발 재분배 확인)
+- unit-of-work-story-map.md (Unit 4: 13개 스토리 UI 담당)
+- 기존 스켈레톤 코드 확인 (frontend-customer 5페이지, frontend-admin 6페이지)
+- useCart.ts, client.ts, types/index.ts 기존 구현 확인
+**Context**: CONSTRUCTION - Unit 4 Functional Design Step 1-2 진행
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Functional Design Answers Received
+**Timestamp**: 2026-04-30T01:05:00Z
+**User Input**: "완료. 진행해"
+**AI Response**: 답변 분석 완료. AI 판단 항목:
+- Q3: Tailwind CSS (미니멀 스타일 + 반응형 + 병렬 개발 최적)
+- Q5: Zustand (경량, localStorage 미들웨어, 기존 useCart 패턴 호환)
+- Q8: React Hook Form (관리자 앱 폼 다수, 비제어 컴포넌트 성능)
+- Q11: MSW (실제 API 패턴 유지, Mock 제거 용이)
+모호성 없음, 아티팩트 생성 진행.
+**Context**: CONSTRUCTION - Unit 4 Functional Design Step 5-6 진행
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Functional Design Artifacts Generated
+**Timestamp**: 2026-04-30T01:10:00Z
+**AI Response**: Functional Design 아티팩트 생성 완료:
+- frontend-components.md: 고객 앱 5페이지 + 관리자 앱 5페이지 컴포넌트 계층, Props/State, 라우팅, i18n 구조
+- business-logic-model.md: 자동 로그인, 장바구니, 주문 생성, 폴링, 관리자 CRUD 플로우, API 연동 포인트, MSW Mock 전략
+- business-rules.md: 폼 유효성 12개 폼, 장바구니 규칙 8개, 인증 규칙 8개, UI 인터랙션 규칙, 데이터 포맷, 반응형 브레이크포인트
+기술 스택 결정: Tailwind CSS, Zustand, React Hook Form + Zod, react-i18next, MSW
+**Context**: CONSTRUCTION - Unit 4 Functional Design 완료, 사용자 승인 대기
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Functional Design Approved
+**Timestamp**: 2026-04-30T01:15:00Z
+**User Input**: "승인"
+**AI Response**: Functional Design 승인 완료, NFR Requirements 단계로 진행
+**Context**: CONSTRUCTION - Unit 4 Functional Design 승인 완료, NFR Requirements 시작
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - NFR Requirements Answers Received
+**Timestamp**: 2026-04-30T01:20:00Z
+**User Input**: "완료"
+**AI Response**: 답변 분석 완료:
+- Q1: B (2초 이내), Q2: B (lazy+WebP+썸네일), Q3: C (단위+통합+E2E)
+- Q4: C → Vitest + RTL (Vite 호환), Q5: D → ESLint + Prettier (표준)
+- Q6: A (WCAG 2.1 AA), Q7: B (페이지+모달 lazy), Q8: C (MVP 이후 추가)
+아티팩트 생성: nfr-requirements.md, tech-stack-decisions.md
+**Context**: CONSTRUCTION - Unit 4 NFR Requirements 완료, 사용자 승인 대기
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - NFR Requirements Approved
+**Timestamp**: 2026-04-30T01:25:00Z
+**User Input**: "승인"
+**AI Response**: NFR Requirements 승인 완료, NFR Design 단계로 진행
+**Context**: CONSTRUCTION - Unit 4 NFR Requirements 승인 완료, NFR Design 시작
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - NFR Design Artifacts Generated
+**Timestamp**: 2026-04-30T01:30:00Z
+**AI Response**: NFR Design 아티팩트 생성 완료 (질문 불필요 — NFR Requirements에서 기술 결정 완료):
+- nfr-design-patterns.md: 코드 스플리팅, 이미지 최적화(LazyImage), 메모이제이션, Zustand persist, 낙관적 업데이트, Error Boundary 3계층, API 에러 핸들링, 토스트, 접근성(포커스 트랩, ARIA, 키보드), 보안(토큰, 입력 검증)
+- logical-components.md: API 클라이언트 아키텍처, MSW Mock 레이어, 인증 가드(고객+관리자+역할), i18n 동적 로딩, 테스트 구조, Vite 빌드 최적화(청크 분리)
+**Context**: CONSTRUCTION - Unit 4 NFR Design 완료, 사용자 승인 대기
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - NFR Design Approved
+**Timestamp**: 2026-04-30T01:35:00Z
+**User Input**: "승인"
+**AI Response**: NFR Design 승인 완료, Infrastructure Design 건너뛰기 (프론트엔드 UI 유닛 — 인프라 설계 불필요), Code Generation 단계로 진행
+**Context**: CONSTRUCTION - Unit 4 NFR Design 승인 완료, Code Generation 시작
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Code Generation Plan Created
+**Timestamp**: 2026-04-30T01:40:00Z
+**AI Response**: Code Generation Plan 생성 완료 — 21개 Step:
+- Step 1-2: 프로젝트 기반 설정 (고객/관리자 앱)
+- Step 3-4: 공통 UI 컴포넌트
+- Step 5: Zustand Store
+- Step 6: API 클라이언트 + 유틸리티
+- Step 7: MSW Mock
+- Step 8: 인증 가드 + 라우팅
+- Step 9-13: 고객 앱 5페이지
+- Step 14-18: 관리자 앱 5페이지
+- Step 19-20: 단위/통합 테스트
+- Step 21: 요약 문서
+사용자 승인 대기
+**Context**: CONSTRUCTION - Unit 4 Code Generation Part 1 (Planning) 완료
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Code Generation Plan Approved
+**Timestamp**: 2026-04-30T01:45:00Z
+**User Input**: "승인"
+**AI Response**: Code Generation Plan 승인 완료, Part 2 (Generation) 시작 — Step 1부터 실행
+**Context**: CONSTRUCTION - Unit 4 Code Generation Part 2 시작
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Code Generation Complete
+**Timestamp**: 2026-04-30T02:00:00Z
+**AI Response**: Code Generation 완료 — 21개 Step 모두 실행:
+- 고객 앱: 37개 파일 (5페이지, 7컴포넌트, 3Store, 3API, 2훅, 1유틸, MSW Mock, 17테스트)
+- 관리자 앱: 28개 파일 (5페이지, 2컴포넌트, 1Store, 4API, 1유틸, MSW Mock, 3테스트)
+- 스토리 커버리지: 14/14 (100%)
+사용자 승인 대기
+**Context**: CONSTRUCTION - Unit 4 Code Generation 완료
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Code Generation Approved
+**Timestamp**: 2026-04-30T02:05:00Z
+**User Input**: "승인"
+**AI Response**: Code Generation 승인 완료, Build & Test 단계로 진행
+**Context**: CONSTRUCTION - Unit 4 Code Generation 승인 완료, Build & Test 시작
+
+---
+
+## CONSTRUCTION - Unit 4 (UI) - Build and Test Complete
+**Timestamp**: 2026-04-30T02:10:00Z
+**AI Response**: Build and Test 문서 생성 완료:
+- build-instructions.md: 빌드 가이드 (의존성, 빌드, 개발 서버, 트러블슈팅)
+- unit-test-instructions.md: 단위 테스트 20개 실행 가이드
+- integration-test-instructions.md: 통합 테스트 4개 시나리오
+- e2e-test-instructions.md: E2E 테스트 4개 시나리오 (Playwright)
+- build-and-test-summary.md: 전체 요약
+**Context**: CONSTRUCTION - Unit 4 Build and Test 완료
+
+---
