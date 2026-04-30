@@ -1,0 +1,59 @@
+{
+  "common": {
+    "confirm": "확인",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "close": "닫기",
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "retry": "다시 시도",
+    "back": "뒤로"
+  },
+  "auth": {
+    "setupTitle": "태블릿 설정",
+    "storeCode": "매장 식별자",
+    "tableNumber": "테이블 번호",
+    "password": "비밀번호",
+    "submit": "설정 완료",
+    "loginFailed": "인증 정보가 올바르지 않습니다",
+    "storeCodeRequired": "매장 식별자를 입력해주세요",
+    "tableNumberRequired": "테이블 번호를 입력해주세요",
+    "passwordRequired": "비밀번호는 4자 이상이어야 합니다"
+  },
+  "menu": {
+    "title": "메뉴",
+    "addToCart": "담기",
+    "addToCartFull": "장바구니에 담기",
+    "noMenu": "등록된 메뉴가 없습니다"
+  },
+  "cart": {
+    "title": "장바구니",
+    "empty": "장바구니가 비어있습니다",
+    "emptyDescription": "메뉴에서 원하는 음식을 담아보세요",
+    "total": "합계",
+    "totalCount": "총 {{count}}개",
+    "order": "주문하기",
+    "clear": "비우기",
+    "maxQuantity": "최대 수량에 도달했습니다"
+  },
+  "order": {
+    "confirmTitle": "주문 확인",
+    "confirmButton": "주문 확정",
+    "successTitle": "주문이 완료되었습니다",
+    "successRedirect": "{{seconds}}초 후 메뉴 화면으로 이동합니다",
+    "orderNumber": "주문 번호",
+    "historyTitle": "주문 내역",
+    "noOrders": "주문 내역이 없습니다",
+    "status": {
+      "pending": "대기중",
+      "preparing": "준비중",
+      "completed": "완료"
+    }
+  },
+  "error": {
+    "network": "네트워크 연결을 확인해주세요",
+    "server": "서버 오류가 발생했습니다",
+    "unknown": "알 수 없는 오류가 발생했습니다"
+  }
+}
