@@ -1,63 +1,47 @@
-# 테이블오더 서비스 - Unit of Work 의존성
+# 테이블오더 서비스 - Unit of Work 의존성 (4명 병렬)
 
 ## 의존성 매트릭스
 
-| Unit | Backend API | Customer Frontend | Admin Frontend |
-|---|---|---|---|
-| **Backend API** | — | 없음 | 없음 |
-| **Customer Frontend** | REST API 의존 | — | 없음 |
-| **Admin Frontend** | REST API + SSE 의존 | 없음 | — |
+| Unit | Unit 1 (Foundation) | Unit 2 (Menu) | Unit 3 (Order) | Unit 4 (UI) |
+|---|---|---|---|---|
+| **Unit 1** | — | 없음 | 없음 | 없음 |
+| **Unit 2** | DB 구조 공유 | — | 없음 | 없음 |
+| **Unit 3** | SessionService 인터페이스 | 없음 | — | 없음 |
+| **Unit 4** | API 스펙 (Mock) | API 스펙 (Mock) | API 스펙 (Mock) | — |
 
 ---
 
-## 의존성 방향
+## 병렬 개발 가능 조건
+
+1. **Unit 1이 Day 1에 공유할 것:**
+   - DB 마이그레이션 기반 구조 (alembic 설정)
+   - SessionService 인터페이스 (메서드 시그니처)
+   - OpenAPI 스펙 초안 (전체 엔드포인트 목록)
+   - 공통 모듈 (config, database, exceptions, security utils)
+
+2. **나머지 Unit은 독립 개발:**
+   - Unit 2: 메뉴 모델/API를 독립적으로 개발
+   - Unit 3: 주문 모델/API를 독립적으로 개발 (세션은 인터페이스 Mock)
+   - Unit 4: API Mock 서버로 UI 개발
+
+---
+
+## 통합 순서
 
 ```
-+-------------------+
-| Unit 1: Backend   |  ← 의존 없음 (독립 개발 가능)
-+-------------------+
-       ^       ^
-       |       |
-  REST |       | REST + SSE
-       |       |
-+----------+ +----------+
-| Unit 2:  | | Unit 3:  |
-| Customer | | Admin    |
-+----------+ +----------+
+Phase 1 (병렬): 각 Unit 독립 개발 + 단위 테스트
+Phase 2 (통합): Unit 1 + Unit 2 + Unit 3 백엔드 머지
+Phase 3 (연동): Unit 4 UI → 실제 API 연동
+Phase 4 (E2E): 전체 플로우 테스트
 ```
 
 ---
 
-## 개발 순서 및 근거
+## 브랜치 전략
 
-| 순서 | Unit | 근거 |
+| Unit | 브랜치명 | 머지 대상 |
 |---|---|---|
-| 1 | Backend API | 프론트엔드가 호출할 API가 먼저 존재해야 함 |
-| 2 | Customer Frontend | 관리자 앱보다 단순 (폴링만, SSE 없음) |
-| 3 | Admin Frontend | SSE 연동 + 복잡한 대시보드, 백엔드 완성 후 개발 |
-
----
-
-## 통합 포인트
-
-| 통합 포인트 | Unit 1 ↔ Unit 2 | Unit 1 ↔ Unit 3 |
-|---|---|---|
-| 인증 | JWT 토큰 발급/검증 | JWT 토큰 발급/검증 |
-| 메뉴 조회 | GET /api/customer/menu | GET /api/admin/menu |
-| 주문 생성 | POST /api/customer/orders | — |
-| 주문 조회 | GET /api/customer/orders/session | GET /api/admin/orders/table |
-| 실시간 | — (폴링) | SSE /api/admin/orders/stream |
-| 테이블 관리 | — | POST/GET /api/admin/tables |
-| 메뉴 관리 | — | CRUD /api/admin/menu |
-| 매장 관리 | — | CRUD /api/hq/stores |
-
----
-
-## 통합 테스트 전략
-
-| 테스트 단계 | 범위 | 시점 |
-|---|---|---|
-| Unit 1 단독 | API 엔드포인트 + DB | Unit 1 완료 후 |
-| Unit 1 + Unit 2 | 고객 주문 플로우 E2E | Unit 2 완료 후 |
-| Unit 1 + Unit 3 | 관리자 모니터링 E2E | Unit 3 완료 후 |
-| 전체 통합 | 고객 주문 → 관리자 수신 → 상태 변경 → 고객 확인 | 모든 Unit 완료 후 |
+| Unit 1 | `unit/1-foundation` | `develop` |
+| Unit 2 | `unit/2-menu` | `develop` |
+| Unit 3 | `unit/3-order` | `develop` |
+| Unit 4 | `unit/4-ui` | `develop` |
