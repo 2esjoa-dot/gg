@@ -1,41 +1,61 @@
-from datetime import datetime, timedelta
+"""TableSession repository for database operations."""
 
-from sqlalchemy import select, and_
+from datetime import datetime, timezone
+
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.session import TableSession, SessionStatus
+from app.models.session import SessionStatus, TableSession
+from app.repositories.base import BaseRepository
 
 
-class SessionRepository:
-    def __init__(self, db: AsyncSession):
-        self.db = db
+class SessionRepository(BaseRepository[TableSession]):
+    """Repository for TableSession entity operations."""
 
-    async def create(self, store_id: int, table_id: int) -> TableSession:
-        session = TableSession(
-            store_id=store_id,
-            table_id=table_id,
-            status=SessionStatus.ACTIVE,
-            started_at=datetime.utcnow(),
-            expires_at=datetime.utcnow() + timedelta(hours=16),
-        )
-        self.db.add(session)
-        await self.db.flush()
-        return session
+    def __init__(self):
+        super().__init__(TableSession)
 
-    async def get_active(self, store_id: int, table_id: int) -> TableSession | None:
-        result = await self.db.execute(
+    async def get_active_session(
+        self, db: AsyncSession, store_id: int, table_id: int
+    ) -> TableSession | None:
+        """Find the active session for a specific table."""
+        now = datetime.now(timezone.utc)
+        result = await db.execute(
             select(TableSession).where(
-                and_(
-                    TableSession.store_id == store_id,
-                    TableSession.table_id == table_id,
-                    TableSession.status == SessionStatus.ACTIVE,
-                )
+                TableSession.store_id == store_id,
+                TableSession.table_id == table_id,
+                TableSession.status == SessionStatus.ACTIVE,
+                TableSession.expires_at > now,
             )
         )
         return result.scalar_one_or_none()
 
-    async def close_session(self, session: TableSession) -> TableSession:
-        session.status = SessionStatus.COMPLETED
-        session.completed_at = datetime.utcnow()
-        await self.db.flush()
-        return session
+    async def get_expired_active_session(
+        self, db: AsyncSession, store_id: int, table_id: int
+    ) -> TableSession | None:
+        """Find an expired but still marked active session."""
+        now = datetime.now(timezone.utc)
+        result = await db.execute(
+            select(TableSession).where(
+                TableSession.store_id == store_id,
+                TableSession.table_id == table_id,
+                TableSession.status == SessionStatus.ACTIVE,
+                TableSession.expires_at <= now,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def get_completed_sessions(
+        self, db: AsyncSession, store_id: int, table_id: int
+    ) -> list[TableSession]:
+        """Get completed sessions for a table, ordered by completion time desc."""
+        result = await db.execute(
+            select(TableSession)
+            .where(
+                TableSession.store_id == store_id,
+                TableSession.table_id == table_id,
+                TableSession.status == SessionStatus.COMPLETED,
+            )
+            .order_by(TableSession.completed_at.desc())
+        )
+        return list(result.scalars().all())

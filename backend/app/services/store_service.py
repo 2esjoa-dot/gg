@@ -1,25 +1,41 @@
+"""Store management service."""
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.store import Store
 from app.repositories.store_repository import StoreRepository
+from app.schemas.store import StoreCreateRequest, StoreListResponse, StoreResponse
 from app.utils.exceptions import DuplicateError, NotFoundError
 
 
 class StoreService:
-    def __init__(self, db: AsyncSession):
-        self.store_repo = StoreRepository(db)
+    """Handles store CRUD operations."""
 
-    async def create_store(self, name: str, code: str, address: str | None = None) -> Store:
-        existing = await self.store_repo.get_by_code(code)
+    def __init__(self):
+        self.store_repo = StoreRepository()
+
+    async def create_store(self, db: AsyncSession, request: StoreCreateRequest) -> StoreResponse:
+        """Create a new store."""
+        existing = await self.store_repo.get_by_code(db, request.code)
         if existing:
-            raise DuplicateError("매장 식별자")
-        return await self.store_repo.create(name=name, code=code, address=address)
+            raise DuplicateError("매장 코드")
 
-    async def get_store(self, store_id: int) -> Store:
-        store = await self.store_repo.get_by_id(store_id)
+        store = await self.store_repo.create(
+            db, name=request.name, code=request.code, address=request.address
+        )
+        await db.commit()
+        return StoreResponse.model_validate(store)
+
+    async def get_store(self, db: AsyncSession, store_id: int) -> StoreResponse:
+        """Get a store by ID."""
+        store = await self.store_repo.get_by_id(db, store_id)
         if not store:
             raise NotFoundError("매장")
-        return store
+        return StoreResponse.model_validate(store)
 
-    async def list_stores(self) -> list[Store]:
-        return await self.store_repo.get_all()
+    async def list_stores(self, db: AsyncSession) -> StoreListResponse:
+        """List all active stores."""
+        stores = await self.store_repo.get_active_stores(db)
+        return StoreListResponse(
+            stores=[StoreResponse.model_validate(s) for s in stores],
+            total=len(stores),
+        )

@@ -1,31 +1,71 @@
-from fastapi import Depends, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+"""Authentication and authorization middleware."""
 
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
+
+from app.utils.exceptions import AuthenticationError, AuthorizationError, TokenExpiredError
 from app.utils.security import decode_access_token
-from app.utils.exceptions import AuthExpiredError, ForbiddenError
 
-security = HTTPBearer()
+# Paths that do not require authentication
+PUBLIC_PATHS = {"/docs", "/redoc", "/openapi.json", "/health", "/uploads"}
 
-
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
-    payload = decode_access_token(credentials.credentials)
-    if not payload:
-        raise AuthExpiredError()
-    return payload
-
-
-def require_role(*roles: str):
-    async def role_checker(current_user: dict = Depends(get_current_user)) -> dict:
-        if current_user.get("role") not in roles:
-            raise ForbiddenError()
-        return current_user
-    return role_checker
+# Role-to-path prefix mapping
+ROLE_PATH_MAP = {
+    "tablet": "/api/customer/",
+    "store_admin": "/api/admin/",
+    "hq_admin": "/api/hq/",
+}
 
 
-def require_store_access(current_user: dict = Depends(get_current_user)) -> dict:
-    """Ensures the user can only access their own store data."""
-    return current_user
+class AuthMiddleware(BaseHTTPMiddleware):
+    """JWT-based authentication and role-based authorization."""
 
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
+        path = request.url.path
 
-def get_store_id(current_user: dict = Depends(get_current_user)) -> int:
-    return current_user["store_id"]
+        # Skip auth for public paths
+        if self._is_public(path):
+            return await call_next(request)
+
+        # Skip auth for non-API paths (static files, etc.)
+        if not path.startswith("/api/"):
+            return await call_next(request)
+
+        # Extract token
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            raise AuthenticationError()
+
+        token = auth_header[7:]
+        payload = decode_access_token(token)
+        if payload is None:
+            raise TokenExpiredError()
+
+        # Check role-based access
+        role = payload.get("role", "")
+        if not self._check_role_access(role, path):
+            raise AuthorizationError()
+
+        # Set user context on request state
+        request.state.user = payload
+        request.state.store_id = payload.get("store_id")
+        request.state.role = role
+
+        return await call_next(request)
+
+    @staticmethod
+    def _is_public(path: str) -> bool:
+        """Check if the path is public (no auth required)."""
+        for public_path in PUBLIC_PATHS:
+            if path == public_path or path.startswith(public_path + "/"):
+                return True
+        return False
+
+    @staticmethod
+    def _check_role_access(role: str, path: str) -> bool:
+        """Verify the role has access to the requested path."""
+        allowed_prefix = ROLE_PATH_MAP.get(role)
+        if allowed_prefix is None:
+            return False
+        return path.startswith(allowed_prefix)

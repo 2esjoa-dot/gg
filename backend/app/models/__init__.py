@@ -1,10 +1,20 @@
-from app.models.store import Store
-from app.models.user import User
-from app.models.table import Table
-from app.models.session import TableSession
-from app.models.category import Category
-from app.models.menu_item import MenuItem
-from app.models.order import Order
-from app.models.order_item import OrderItem
+"""SQLAlchemy model base and imports."""
 
-__all__ = ["Store", "User", "Table", "TableSession", "Category", "MenuItem", "Order", "OrderItem"]
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    """Base class for all SQLAlchemy models."""
+
+    pass
+
+
+# Import all models so Alembic can detect them
+from app.models.store import Store  # noqa: E402, F401
+from app.models.user import User  # noqa: E402, F401
+from app.models.table import Table  # noqa: E402, F401
+from app.models.session import TableSession  # noqa: E402, F401
+from app.models.category import Category  # noqa: E402, F401
+from app.models.menu_item import MenuItem  # noqa: E402, F401
+from app.models.order import Order  # noqa: E402, F401
+from app.models.order_item import OrderItem  # noqa: E402, F401
