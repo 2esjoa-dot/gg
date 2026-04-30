@@ -1,90 +1,59 @@
-# Unit Test Execution - Unit 2: Menu
+# Unit Test 실행 가이드 - Unit 4 (UI)
 
-## 백엔드 단위 테스트
+## 테스트 프레임워크
+- **러너**: Vitest
+- **DOM 환경**: jsdom
+- **컴포넌트 테스트**: React Testing Library
+- **커버리지**: @vitest/coverage-v8
 
-### 사전 준비
-```bash
-cd backend
-pip install -r requirements.txt
-pip install -r tests/requirements-test.txt
-```
+## 테스트 실행
 
-### 전체 테스트 실행
-```bash
-pytest tests/ -v
-```
-
-### Unit 2 관련 테스트만 실행
-```bash
-# Repository 계층 테스트
-pytest tests/test_menu_repository.py -v
-
-# Service 계층 테스트
-pytest tests/test_menu_service.py -v
-
-# Router 계층 테스트
-pytest tests/test_menu_router.py -v
-```
-
-### 테스트 커버리지 확인
-```bash
-pip install pytest-cov
-pytest tests/test_menu_repository.py tests/test_menu_service.py tests/test_menu_router.py --cov=app/repositories/category_repository --cov=app/repositories/menu_repository --cov=app/services/menu_service --cov=app/services/file_service --cov=app/routers/admin_menu --cov=app/routers/customer_menu -v
-```
-
-### 예상 결과
-
-| 테스트 파일 | 테스트 수 | 예상 결과 |
-|---|---|---|
-| test_menu_repository.py | 18 | 전체 통과 |
-| test_menu_service.py | 14 | 전체 통과 |
-| test_menu_router.py | 9 | 전체 통과 |
-| **합계** | **41** | **전체 통과** |
-
-### 테스트 범위
-
-| 계층 | 테스트 항목 |
-|---|---|
-| Repository | 카테고리 CRUD, 메뉴 CRUD, soft delete, 순서 변경, 멀티테넌시 격리 |
-| Service | 카테고리 중복 검증, 메뉴 생성/수정/삭제, 카테고리 삭제 제한, 순서 변경 |
-| Router | 인증/인가, 카테고리 API, 메뉴 API, 고객 메뉴 조회 |
-
-## 프론트엔드 단위 테스트
-
-### 사전 준비
+### 고객 앱 전체 테스트
 ```bash
 cd frontend-customer
-npm install
-npm install --save-dev vitest jsdom
+npm run test
 ```
 
-### vitest 설정 (vite.config.ts에 추가)
-```typescript
-/// <reference types="vitest" />
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    globals: true,
-  },
-})
-```
-
-### 테스트 실행
+### 관리자 앱 전체 테스트
 ```bash
-npx vitest run
+cd frontend-admin
+npm run test
 ```
 
-### 예상 결과
+### 커버리지 포함 실행
+```bash
+cd frontend-customer
+npm run test:coverage
+```
 
-| 테스트 파일 | 테스트 수 | 예상 결과 |
+### 특정 파일만 실행
+```bash
+cd frontend-customer
+npx vitest run tests/unit/store/cartStore.test.ts
+```
+
+## 테스트 목록
+
+### 고객 앱 단위 테스트
+
+| 파일 | 테스트 수 | 대상 |
 |---|---|---|
-| MenuPage.test.tsx | 6 | 전체 통과 |
+| tests/unit/store/cartStore.test.ts | 9 | 장바구니 Store (추가, 삭제, 수량, 최대 50개, 총액) |
+| tests/unit/store/authStore.test.ts | 3 | 인증 Store (로그인, 로그아웃, 세션 ID) |
+| tests/unit/utils/format.test.ts | 5 | 금액/날짜 포맷 유틸 |
 
-### 테스트 범위
-- CategoryTab: onSelect 콜백 호출 검증
-- MenuCard: 가격 포맷팅, placeholder 이미지 처리
-- MenuPage: 카테고리 자동 선택, 카테고리별 필터링, 빈 상태 처리
+### 관리자 앱 단위 테스트
+
+| 파일 | 테스트 수 | 대상 |
+|---|---|---|
+| tests/unit/store/authStore.test.ts | 3 | 관리자 인증 Store (로그인, 역할, 로그아웃) |
+
+## 예상 결과
+- **총 테스트**: 20개
+- **예상 통과**: 20/20
+- **커버리지 목표**: 80% 이상 (Store, 유틸 레이어)
+
+## 실패 시 대응
+1. 실패한 테스트 출력 확인
+2. 관련 소스 코드 수정
+3. `npm run test` 재실행

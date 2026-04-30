@@ -1,85 +1,72 @@
-# Build Instructions - Unit 2: Menu
+# Build Instructions - Unit 4 (UI)
 
-## Prerequisites
-- **Python**: 3.11+
-- **Node.js**: 18+
-- **PostgreSQL**: 15+ (테스트 시 SQLite 사용 가능)
-- **pip**: Python 패키지 관리자
+## 사전 요구사항
+- **Node.js**: v18.x 이상
+- **npm**: v9.x 이상
+- **디스크 공간**: 500MB 이상 (node_modules)
 
-## 백엔드 빌드
+## 빌드 순서
 
-### 1. 가상환경 생성 및 활성화
-```bash
-cd backend
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-```
-
-### 2. 의존성 설치
-```bash
-pip install -r requirements.txt
-pip install -r tests/requirements-test.txt
-```
-
-### 3. 환경변수 설정
-```bash
-# .env.example을 복사하여 .env 생성
-cp .env.example .env
-
-# .env 파일 편집 (DB 연결 정보 등)
-```
-
-### 4. 데이터베이스 마이그레이션
-```bash
-alembic upgrade head
-```
-
-### 5. 서버 실행 (개발 모드)
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 6. API 문서 확인
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## 프론트엔드 빌드
-
-### 1. 의존성 설치
+### 1. 고객 앱 의존성 설치
 ```bash
 cd frontend-customer
 npm install
 ```
 
-### 2. 개발 서버 실행
+### 2. 관리자 앱 의존성 설치
 ```bash
-npm run dev
+cd frontend-admin
+npm install
 ```
 
-### 3. 프로덕션 빌드
+### 3. 고객 앱 빌드
 ```bash
+cd frontend-customer
 npm run build
 ```
+- **예상 출력**: `dist/` 디렉토리에 정적 파일 생성
+- **예상 번들 사이즈**: 초기 로드 200KB 이하 (gzip)
 
-## 빌드 검증
-- 백엔드: `http://localhost:8000/health` → `{"status": "ok"}`
-- 프론트엔드: `http://localhost:5173` → 메뉴 페이지 표시
-- API 문서: `http://localhost:8000/docs` → Swagger UI 표시
-
-## Troubleshooting
-
-### aiosqlite 미설치 (테스트 시)
+### 4. 관리자 앱 빌드
 ```bash
-pip install aiosqlite
+cd frontend-admin
+npm run build
 ```
+- **예상 출력**: `dist/` 디렉토리에 정적 파일 생성
 
-### python-multipart 미설치 (파일 업로드 시)
+## 개발 서버 실행
+
+### 고객 앱 (Mock 모드)
 ```bash
-pip install python-multipart
+cd frontend-customer
+VITE_ENABLE_MOCKS=true npm run dev
 ```
-이미 requirements.txt에 포함되어 있으나, 누락 시 수동 설치.
+- URL: http://localhost:5173
+
+### 관리자 앱 (Mock 모드)
+```bash
+cd frontend-admin
+VITE_ENABLE_MOCKS=true npm run dev
+```
+- URL: http://localhost:5174
+
+### 백엔드 연동 모드
+```bash
+cd frontend-customer
+npm run dev
+```
+- 백엔드가 http://localhost:8000 에서 실행 중이어야 함
+- Vite proxy가 `/api` 요청을 백엔드로 전달
+
+## 트러블슈팅
+
+### 의존성 설치 실패
+- `rm -rf node_modules package-lock.json && npm install`
+
+### TypeScript 컴파일 에러
+- `npx tsc --noEmit` 으로 타입 에러 확인
+- `tsconfig.json`의 `strict: true` 설정 확인
+
+### Tailwind 스타일 미적용
+- `tailwind.config.ts`의 `content` 경로 확인
+- `src/index.css`에 `@tailwind` 디렉티브 확인
