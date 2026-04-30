@@ -4,7 +4,7 @@
 - **Project Name**: 테이블오더 서비스 (Table Order Service)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-04-30T00:00:00Z
-- **Current Stage**: INCEPTION - Units Generation
+- **Current Stage**: CONSTRUCTION - Unit 1 (Backend API) - Functional Design
 
 ## Workspace State
 - **Existing Code**: No
@@ -33,7 +33,7 @@
 - [x] User Stories
 - [x] Workflow Planning
 - [x] Application Design - COMPLETED
-- [ ] Units Generation - EXECUTE
+- [x] Units Generation - COMPLETED
 
 ### 🟢 CONSTRUCTION PHASE (per-unit)
 - [ ] Functional Design - EXECUTE
