@@ -239,3 +239,112 @@ Plan 승인 간주하고 Part 2 Generation 진행
 **Context**: CONSTRUCTION - Unit 1 Functional Design 완료, 사용자 승인 대기
 
 ---
+
+## Unit 2 (Menu) - CONSTRUCTION PHASE 시작
+**Timestamp**: 2026-04-30T01:00:00Z
+**User Input**: "Unit2를 담당하고 있어 Unit작업 시작해줘"
+**AI Response**: Unit 2 (Menu) CONSTRUCTION PHASE 시작. 기존 backend-api Functional Design에서 메뉴 관련 내용을 추출하여 Unit 2 전용 Functional Design 문서 생성 완료. NFR Requirements 질문 파일 생성.
+**Context**: CONSTRUCTION - Unit 2 (Menu) - Functional Design 생성 → NFR Requirements 시작
+
+---
+
+## Unit 2 (Menu) - Functional Design 생성
+**Timestamp**: 2026-04-30T01:01:00Z
+**AI Response**: Unit 2 Functional Design 아티팩트 생성:
+- domain-entities.md: Category, MenuItem 엔티티 정의
+- business-rules.md: 유효성 검증, 삭제 규칙, 이미지 정책, 접근 제어
+- business-logic-model.md: 메뉴 CRUD, 카테고리 CRUD, 이미지 업로드, 고객 조회 로직
+**Context**: CONSTRUCTION - Unit 2 Functional Design 완료
+
+---
+
+## Unit 2 (Menu) - NFR Requirements 질문 생성
+**Timestamp**: 2026-04-30T01:02:00Z
+**AI Response**: NFR Requirements Plan 생성 (menu-nfr-requirements-plan.md). 5개 질문 포함: 이미지 처리, 캐싱, 파일 저장소, 페이지네이션, 프론트엔드 상태 관리
+**Context**: CONSTRUCTION - Unit 2 NFR Requirements, 사용자 답변 대기
+
+---
+
+## Unit 2 (Menu) - NFR Requirements 답변 및 아티팩트 생성
+**Timestamp**: 2026-04-30T01:05:00Z
+**User Input**: "너가 생각했을때 괜찮은 답변으로 정해서 업데이트 해줘"
+**AI Response**: 프로젝트 특성(MVP, 테이블오더, 매장별 소규모 데이터) 기반으로 답변 결정:
+- Q1: A (원본 그대로 저장)
+- Q2: A (캐싱 없음)
+- Q3: C (MVP 로컬, 추후 S3)
+- Q4: A (페이지네이션 없음)
+- Q5: A (React 기본 useState/useEffect)
+NFR Requirements 아티팩트 생성 완료: nfr-requirements.md, tech-stack-decisions.md
+**Context**: CONSTRUCTION - Unit 2 NFR Requirements 완료, 사용자 승인 대기
+
+---
+
+## Unit 2 (Menu) - NFR Requirements 승인
+**Timestamp**: 2026-04-30T01:10:00Z
+**User Input**: "승인 후 다음 단계로 넘어가죠"
+**AI Response**: NFR Requirements 승인 완료, NFR Design 단계로 진행
+**Context**: CONSTRUCTION - Unit 2 NFR Requirements 승인 완료, NFR Design 시작
+
+---
+
+## Unit 2 (Menu) - NFR Design 아티팩트 생성
+**Timestamp**: 2026-04-30T01:12:00Z
+**AI Response**: NFR Design 아티팩트 생성 완료:
+- nfr-design-patterns.md: Repository Pattern, Strategy Pattern (FileService), Guard Pattern, Error Handling Pattern, Frontend Error Handling
+- logical-components.md: 백엔드 5개 컴포넌트 (CategoryRepository, MenuRepository, MenuService, FileService, LocalFileService) + 프론트엔드 5개 컴포넌트 (MenuPage, CategoryTab, MenuCard, MenuDetail, API Client)
+**Context**: CONSTRUCTION - Unit 2 NFR Design 완료, 사용자 승인 대기
+
+---
+
+## Unit 2 (Menu) - NFR Design 승인
+**Timestamp**: 2026-04-30T01:15:00Z
+**User Input**: "엉 진행해줘"
+**AI Response**: NFR Design 승인 완료, Code Generation 단계로 진행
+**Context**: CONSTRUCTION - Unit 2 NFR Design 승인 완료, Code Generation 시작
+
+---
+
+## Unit 2 (Menu) - Code Generation Plan 생성
+**Timestamp**: 2026-04-30T01:16:00Z
+**AI Response**: Code Generation Plan 생성 완료. 15개 Step: Repository 2개, Service 2개, Router 2개, Static Files 1개, Unit Test 4개, Frontend 4개, Documentation 1개. 사용자 승인 대기.
+**Context**: CONSTRUCTION - Unit 2 Code Generation Part 1 (Planning), 사용자 승인 대기
+
+---
+
+## Unit 2 (Menu) - Code Generation Plan 승인 및 실행 완료
+**Timestamp**: 2026-04-30T01:20:00Z
+**User Input**: "엉 진행해줘" (NFR Design 승인) → "진행해줘도 좋아" (Code Generation Plan 승인)
+**AI Response**: Code Generation Part 2 실행 완료. 15개 Step 모두 완료:
+- Step 1-2: Repository Layer (CategoryRepository, MenuRepository)
+- Step 3-4: Service Layer (FileService, MenuService)
+- Step 5-6: Router Layer (admin_menu.py, customer_menu.py 구현)
+- Step 7: StaticFiles 마운트
+- Step 8-10: Unit Tests (Repository, Service, Router)
+- Step 11-13: Frontend (API Client, MenuPage, CategoryTab, MenuCard, MenuDetail)
+- Step 14: Frontend Unit Test
+- Step 15: Documentation
+스토리 커버리지: US-A08 ✅, US-A09 ✅, US-C03 ✅
+**Context**: CONSTRUCTION - Unit 2 Code Generation 완료, 사용자 승인 대기
+
+---
+
+## Unit 2 (Menu) - Code Generation 승인
+**Timestamp**: 2026-04-30T01:25:00Z
+**User Input**: "계속 진행해줘"
+**AI Response**: Code Generation 승인 완료, Build and Test 단계로 진행
+**Context**: CONSTRUCTION - Unit 2 Code Generation 승인 완료, Build and Test 시작
+
+---
+
+## Unit 2 (Menu) - Build and Test 완료
+**Timestamp**: 2026-04-30T01:30:00Z
+**AI Response**: Build and Test 문서 생성 완료:
+- build-instructions.md: 백엔드/프론트엔드 빌드 가이드
+- unit-test-instructions.md: 단위 테스트 실행 가이드 (백엔드 41개 + 프론트엔드 6개)
+- integration-test-instructions.md: 통합 테스트 시나리오 3개
+- build-and-test-summary.md: 전체 요약
+IDE 진단: 모든 파일 오류 없음
+aidlc-state.md 업데이트 완료
+**Context**: CONSTRUCTION - Unit 2 Build and Test 완료
+
+---
