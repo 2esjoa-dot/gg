@@ -4,7 +4,7 @@
 - **Project Name**: 테이블오더 서비스 (Table Order Service)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-04-30T00:00:00Z
-- **Current Stage**: CONSTRUCTION - Unit 1 (Backend API) - Functional Design
+- **Current Stage**: CONSTRUCTION - Unit 2 (Menu) - Build and Test 완료
 
 ## Workspace State
 - **Existing Code**: No
@@ -36,12 +36,12 @@
 - [x] Units Generation - COMPLETED
 
 ### 🟢 CONSTRUCTION PHASE (per-unit)
-- [ ] Functional Design - EXECUTE
-- [ ] NFR Requirements - EXECUTE
-- [ ] NFR Design - EXECUTE
-- [ ] Infrastructure Design - EXECUTE
-- [ ] Code Generation - EXECUTE
-- [ ] Build and Test - EXECUTE
+- [x] Functional Design - COMPLETED (Unit 2: Menu)
+- [x] NFR Requirements - COMPLETED (Unit 2: Menu)
+- [x] NFR Design - COMPLETED (Unit 2: Menu)
+- [ ] Infrastructure Design - SKIPPED (Unit 2: 인프라 변경 없음)
+- [x] Code Generation - COMPLETED (Unit 2: Menu)
+- [x] Build and Test - COMPLETED (Unit 2: Menu)
 
 ### 🟡 OPERATIONS PHASE
 - [ ] Operations - PLACEHOLDER
